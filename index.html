@@ -115,6 +115,13 @@
             background-color: #b3e9b5;
         }
 
+        #difficulty-selector {
+            margin: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
         @media (max-height: 600px) {
             h1 {
                 font-size: 1rem;
@@ -131,6 +138,11 @@
 </head>
 <body>
     <h1>乘法贪吃蛇游戏</h1>
+    <div id="difficulty-selector">
+        <button onclick="setDifficulty('easy')">简单模式</button>
+        <button onclick="setDifficulty('normal')" class="active">普通模式</button>
+        <button onclick="setDifficulty('hard')">困难模式</button>
+    </div>
     <div id="question">题目: </div>
     <div id="score">得分: 0</div>
     <div id="game-container">
@@ -156,6 +168,32 @@
         const ctx = canvas.getContext('2d');
         let gridSize;
         let tileCount;
+        let difficulty = 'normal';
+        let gameSpeed = 200;
+        let scoreMultiplier = 1;
+
+        function setDifficulty(level) {
+            difficulty = level;
+            switch(level) {
+                case 'easy':
+                    gameSpeed = 400;
+                    scoreMultiplier = 0.5;
+                    break;
+                case 'normal':
+                    gameSpeed = 300;
+                    scoreMultiplier = 1;
+                    break;
+                case 'hard':
+                    gameSpeed = 200;
+                    scoreMultiplier = 2;
+                    break;
+            }
+            document.querySelectorAll('#difficulty-selector button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            restartGame();
+        }
 
         // キャンバスのリサイズ処理
         function resizeCanvas() {
@@ -278,7 +316,7 @@
                 result: num1 * num2
             };
             document.getElementById('question').textContent = 
-                `問題: ${num1} × ${num2} = ?`;
+                `問题: ${num1} × ${num2} = ?`;
         }
 
         function generateFoods() {
@@ -334,11 +372,11 @@
             checkCollision();
             drawSnake();
             drawFoods();
-            setTimeout(drawGame, 200);
+            setTimeout(drawGame, gameSpeed);
         }
 
         function clearCanvas() {
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = '#b3e9b5';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
@@ -366,7 +404,7 @@
             for (let i = 0; i < foods.length; i++) {
                 if (head.x === foods[i].x && head.y === foods[i].y) {
                     if (foods[i].isCorrect) {
-                        score += 10;
+                        score += Math.round(10 * scoreMultiplier);
                         snake.push({});
                         document.getElementById('score').textContent = `得分: ${score}`;
                         generateQuestion();
