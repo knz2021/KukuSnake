@@ -108,6 +108,3 @@ gridSize = Math.floor(canvas.width / 20);
  添加排行榜功能
  添加自定义主题
  添加更多题型
-
-许可证
-MIT License
