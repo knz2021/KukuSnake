@@ -41,7 +41,7 @@
             width: 100%;
             height: 100%;
             border: 2px solid #f9e054;
-            background-color: #adf0c5;
+            background-color: #f5deb3;
         }
 
         #score {
@@ -88,7 +88,7 @@
         .control-btn {
             padding: 15px;
             font-size: clamp(1rem, 3vw, 1.2rem);
-            background-color: #aae4ac;
+            background-color: #89c8b3;
             color: rgb(50, 152, 248);
             border: none;
             border-radius: 10px;
@@ -97,14 +97,14 @@
         }
 
         .control-btn:active {
-            background-color: #b3e9b5;
+            background-color: vs;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 5px 10px;
             font-size: clamp(1rem, 3vw, 1.2rem);
-            background-color: #aae4ac;
-            color: rgb(0, 132, 255);
+            background-color: #a2dcc9;
+            color: rgb(50, 152, 248);
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -112,15 +112,14 @@
         }
 
         button:hover {
-            background-color: #b3e9b5;
+            background-color: #f3d448;
         }
 
-        #difficulty-selector {
-            font-weight:bold;
-            margin: 10px;
+        #difficulty-selection {
             display: flex;
             justify-content: center;
             gap: 10px;
+            margin: 10px 0;
         }
 
         @media (max-height: 600px) {
@@ -139,12 +138,12 @@
 </head>
 <body>
     <h1>乘法贪吃蛇游戏</h1>
-    <div id="difficulty-selector">
-        <button onclick="setDifficulty('easy')">简单模式</button>
-        <button onclick="setDifficulty('normal')" class="active">普通模式</button>
-        <button onclick="setDifficulty('hard')">困难模式</button>
+    <div id="difficulty-selection">
+        <button onclick="selectDifficulty('easy')">简单模式</button>
+        <button onclick="selectDifficulty('normal')">普通模式</button>
+        <button onclick="selectDifficulty('hard')">困难模式</button>
     </div>
-    <div id="question">题目: </div>
+    <div id="question">问题: </div>
     <div id="score">得分: 0</div>
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
@@ -174,29 +173,26 @@
         let scoreMultiplier = 1;
         let noWallCollision = false;
 
-        function setDifficulty(level) {
-            difficulty = level;
-            switch(level) {
+        function selectDifficulty(mode) {
+            difficulty = mode;
+            switch(mode) {
                 case 'easy':
-                    gameSpeed = 400;
+                    gameSpeed = 300;
                     scoreMultiplier = 0.5;
-                    noWallCollision = true; // イージーモードでは壁の衝突を無効にする
+                    noWallCollision = true;
                     break;
                 case 'normal':
-                    gameSpeed = 300;
+                    gameSpeed = 200;
                     scoreMultiplier = 1;
                     noWallCollision = false;
                     break;
                 case 'hard':
-                    gameSpeed = 200;
+                    gameSpeed = 100;
                     scoreMultiplier = 2;
                     noWallCollision = false;
                     break;
             }
-            document.querySelectorAll('#difficulty-selector button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
+            document.getElementById('difficulty-selection').style.display = 'none';
             restartGame();
         }
 
@@ -321,7 +317,7 @@
                 result: num1 * num2
             };
             document.getElementById('question').textContent = 
-                `問题: ${num1} × ${num2} = ?`;
+                `问题: ${num1} × ${num2} = ?`;
         }
 
         function generateFoods() {
@@ -365,6 +361,7 @@
             document.getElementById('game-over').style.display = 'block';
             document.getElementById('final-score').textContent = score;
             document.getElementById('game-over-reason').textContent = reason;
+            document.getElementById('difficulty-selection').style.display = 'flex'; 
         }
 
         function drawGame() {
@@ -378,18 +375,19 @@
             drawSnake();
             drawFoods();
             setTimeout(drawGame, gameSpeed);
+            
         }
 
         function clearCanvas() {
-            ctx.fillStyle = '#fffacd';
+            ctx.fillStyle = '#f5deb3';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
         function moveSnake() {
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // イージーモードでは壁の衝突を無視し、反対側に移動
             if (noWallCollision) {
+                // 壁の衝突を無視し、反対側に移动
                 if (head.x < 0) head.x = tileCount - 1;
                 if (head.x >= tileCount) head.x = 0;
                 if (head.y < 0) head.y = tileCount - 1;
@@ -403,7 +401,6 @@
         function checkCollision() {
             const head = snake[0];
 
-            // イージーモード以外では壁の衝突をチェック
             if (!noWallCollision && (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount)) {
                 setGameOver("撞到墙壁了！");
                 return;
@@ -473,9 +470,9 @@
 
         // ゲーム初期化
         setupControls();
-        generateQuestion();
-        generateFoods();
-        drawGame();
+
+        // 難易度選択の初期表示
+        document.getElementById('difficulty-selection').style.display = 'flex';
     </script>
 </body>
 </html>
