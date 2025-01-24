@@ -172,6 +172,7 @@
         let difficulty = 'normal';
         let gameSpeed = 200;
         let scoreMultiplier = 1;
+        let noWallCollision = false;
 
         function setDifficulty(level) {
             difficulty = level;
@@ -179,14 +180,17 @@
                 case 'easy':
                     gameSpeed = 400;
                     scoreMultiplier = 0.5;
+                    noWallCollision = true; // イージーモードでは壁の衝突を無効にする
                     break;
                 case 'normal':
                     gameSpeed = 300;
                     scoreMultiplier = 1;
+                    noWallCollision = false;
                     break;
                 case 'hard':
                     gameSpeed = 200;
                     scoreMultiplier = 2;
+                    noWallCollision = false;
                     break;
             }
             document.querySelectorAll('#difficulty-selector button').forEach(btn => {
@@ -383,6 +387,15 @@
 
         function moveSnake() {
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+            // イージーモードでは壁の衝突を無視し、反対側に移動
+            if (noWallCollision) {
+                if (head.x < 0) head.x = tileCount - 1;
+                if (head.x >= tileCount) head.x = 0;
+                if (head.y < 0) head.y = tileCount - 1;
+                if (head.y >= tileCount) head.y = 0;
+            }
+
             snake.unshift(head);
             snake.pop();
         }
@@ -390,7 +403,8 @@
         function checkCollision() {
             const head = snake[0];
 
-            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+            // イージーモード以外では壁の衝突をチェック
+            if (!noWallCollision && (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount)) {
                 setGameOver("撞到墙壁了！");
                 return;
             }
